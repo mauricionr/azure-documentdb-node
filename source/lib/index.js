@@ -1,3 +1,4 @@
+/*
 The MIT License (MIT)
 Copyright (c) 2014 Microsoft Corporation
 
@@ -18,3 +19,20 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+*/
+
+"use strict";
+
+var Client = require("./documentclient")
+  , Hash = require("./hash/hashPartitionResolver")
+  , Range = require("./range");
+
+if (typeof exports !== "undefined") {
+    exports.DocumentClient = Client.DocumentClient;
+    exports.DocumentBase = Client.DocumentBase;
+    exports.Base = Client.Base;
+    exports.Constants = Client.Constants;
+    exports.Range = Range.Range;
+    exports.RangePartitionResolver = Range.RangePartitionResolver;
+    exports.HashPartitionResolver = Hash.HashPartitionResolver;
+}
