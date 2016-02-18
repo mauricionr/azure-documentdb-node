@@ -1,12 +1,4 @@
-﻿console.log();
-console.log('Azure DocumentDB Node.js Samples');
-console.log('================================');
-console.log();
-console.log('DOCUMENT MANAGEMENT');
-console.log('===================');
-console.log();
-
-var DocumentDBClient = require('documentdb').DocumentClient
+﻿var DocumentDBClient = require('documentdb').DocumentClient
   , config = require('../Shared/config')
   , fs = require('fs')
   , async = require('async')
@@ -32,7 +24,6 @@ var client = new DocumentDBClient( host, { masterKey: masterKey });
 //so dbs/databaseId instead of dbs/databaseId/
 
 //-----------------------------------------------------------------------------------------
-// This demo performs a few steps
 // 1. createDocuments   - Insert some documents in to collection
 // 2. listDocuments     - Read the document feed for a collection
 // 3. readDocument      - Read a single document by its id
@@ -41,118 +32,8 @@ var client = new DocumentDBClient( host, { masterKey: masterKey });
 // 6. deleteDocument    - Given a document id, delete it
 //------------------------------------------------------------------------------------------
 
-//ensuring a database & collection exists for us to work with
-init(function (err) {
-    if (!err) {
-        dbLink = 'dbs/' + databaseId;
-        console.log(dbLink);
-        
-        collLink = dbLink + '/colls/' + collectionId;
-        console.log(collLink);
-        
-        //1.
-        console.log('\n1. insertDocuments in to database \'' + databaseId + '\' and collection \'' + collectionId + '\'');
-        insertDocuments(collLink, function (docs) {
-            console.log(docs.length + ' docs created');
-            
-            //2. 
-            console.log('\n2. listDocuments in collection \'' + collLink + '\'');
-            listDocuments(collLink, function (docs) {
-                for (var i = 0; i < docs.length; i++) {
-                    console.log(docs[i].id);
-                }
-                
-                //3.
-                var docId = docs[0].id;
-                var docLink = collLink + '/docs/' + docId;
-                console.log('\n3. readDocument \'' + docLink + '\'');
-                readDocument(docLink, function (doc) {
-                    console.log('Document with id \'' + docId + '\' returned a doc with _self of \'' + doc._self + '\'');
-                    
-                    var querySpec = {
-                        query: 'SELECT * FROM Families f WHERE  f.lastName = @lastName',
-                        parameters: [
-                            {
-                                name: '@lastName',
-                                value: 'Andersen'
-                            }
-                        ]
-                    };
-                    
-                    //4.
-                    console.log('\n4. queryDocuments in collection \'' + collLink + '\'');
-                    client.queryDocuments(collLink, querySpec).toArray(function (err, results) {
-                        if (err) {
-                            handleError(err);
-
-                        } else if (results.length == 0) {
-                            throw ("No documents found matching");
-
-                        } else if (results.length > 1) {
-                            throw ("More than 1 document found matching");
-
-                        } else {
-                            var doc = results[0];
-                            console.log('The \'' + doc.id + '\' family has lastName \'' + doc.lastName + '\'');
-                            console.log('The \'' + doc.id + '\' family has ' + doc.children.length + ' children \'');
-                            
-                            docLink = 'dbs/' + databaseId + '/colls/' + collectionId + '/docs/' + doc.id;
-                            
-                            //add a new child to this family, and change the family's lastName
-                            var childDef = {
-                                "firstName": "Newborn",
-                                "gender": "unknown",
-                                "fingers": 10,
-                                "toes": 10
-                            };
-                            
-                            doc.children.push(childDef);
-                            doc.lastName = "Updated Family";
-                            
-                            //5.
-                            console.log('\n5. replaceDocument with id \'' + docLink + '\'');
-                            client.replaceDocument(docLink, doc, function (err, updated) {
-                                if (err) {
-                                    handleError(err);
-                                } else {
-                                    console.log('The \'' + doc.id + '\' family has lastName \'' + doc.lastName + '\'');
-                                    console.log('The \'' + doc.id + '\' family has ' + doc.children.length + ' children \'');
-                                    
-                                    //6.
-                                    console.log('\n6. deleteDocument \'' + docLink + '\'');
-                                    client.deleteDocument(docLink, function (err) {
-                                        if (err) {
-                                            handleError(err);
-                                        } else {
-                                            console.log('Document deleted');
-                                            
-                                            //cleanup & end
-                                            console.log('\nCleaning up ...');
-                                            finish();
-                                        }
-                                    });
-                                }
-                            });
-                        }
-                    });
-                });
-            });
-        });
-    }
-});
-
-
-function init(callback) {
-    getOrCreateDatabase(databaseId, function (db) {
-        getOrCreateCollection(db._self, collectionId, function (coll) {
-            callback();
-        });
-    });
-}
-
 function insertDocuments(collLink, callback) {
     var createdList = [];
-
     async.each(
         documentDefinitions(), 
         
@@ -177,10 +58,9 @@ function insertDocuments(collLink, callback) {
 }
 
 function listDocuments(collLink, callback) {
-    var queryIterator = client.readDocuments(collLink).toArray(function (err, docs) {
+    return client.readDocuments(collLink).toArray(function (err, docs) {
         if (err) {
             handleError(err);
-        
         } else {
             console.log(docs.length + ' Documents found');
             callback(docs);

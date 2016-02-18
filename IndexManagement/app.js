@@ -1,12 +1,4 @@
-﻿console.log();
-console.log('Azure DocumentDB Node.js Samples');
-console.log('================================');
-console.log();
-console.log('INDEX MANAGEMENT');
-console.log('================');
-console.log();
-
-var DocumentDBClient = require('documentdb').DocumentClient
+﻿var DocumentDBClient = require('documentdb').DocumentClient
   , DocumentBase = require('documentdb').DocumentBase
   , async = require('async')
   , config = require('../Shared/config')
@@ -35,7 +27,6 @@ var client = new DocumentDBClient(host, { masterKey: masterKey });
 //also, ensure there is no leading space
 
 //-----------------------------------------------------------------------------------------------------------
-// This demo performs a few steps
 // 1. explictlyExcludeFromIndex - how to manually exclude a document from being indexed
 // 2. useManualIndexing         - switch auto indexing off, and then manually add individual docs
 // 3. useLazyIndexing           - create a collection with indexing mode set to Lazy instead of consistent
@@ -45,77 +36,6 @@ var client = new DocumentDBClient(host, { masterKey: masterKey });
 // 7. performIndexTransforms    - create a collection with default indexPolicy, then update this online
 //------------------------------------------------------------------------------------------------------------
 
-//ensuring a database & collection exists for us to work with
-init(function (err) {
-    if (!err) {
-        dbLink = 'dbs/' + databaseId;
-        console.log(dbLink);
-                
-        //1.
-        console.log('\n1.');
-        console.log('explictlyExcludeFromIndex - manually exclude document from being indexed');
-        explictlyExcludeFromIndex(function (err) {
-            if (!err) {
-                
-                //2.
-                console.log('\n2.');
-                console.log('useManualIndexing - switch auto indexing off, and manually index docs');
-                useManualIndexing(function (err) {
-                    if (!err) {
-                        
-                        //3.
-                        console.log('\n3.');
-                        console.log('useLazyIndexing - create collection lazy index');
-                        useLazyIndexing(function (err) {
-                            if (!err) {
-                                
-                                //4.
-                                console.log('\n4.');
-                                console.log('forceScanOnHashIndexPath  - use index directive to allow range scan on path without range index');
-                                forceScanOnHashIndexPath(function (err) {
-                                    if (!err) {
-                                        
-                                        //5.
-                                        console.log('\n5.');
-                                        console.log('useRangeIndexOnStrings  - create a range index on string path');
-                                        useRangeIndexOnStrings(function (err) {
-                                            if (!err) {
-                                                
-                                                //6.
-                                                console.log('\n6.');
-                                                console.log('excludePathsFromIndex  - create a range index on string path');
-                                                excludePathsFromIndex(function (err) {
-                                                    if (!err) {
-                                                        
-                                                        //7.
-                                                        console.log('\n7.');
-                                                        console.log('performIndexTransforms  - update an index policy online');
-                                                        performIndexTransforms(function (err) {
-                                                            if (!err) {
-                                                                
-                                                                finish();
-                                                            }
-                                                        });
-                                                    }
-                                                });
-                                            }
-                                        });
-                                    }
-                                });
-                            }
-                        });
-                    }
-                });
-            }             
-        });
-    }
-});
-
-function init(callback) {
-    getOrCreateDatabase(databaseId, function (db) {
-        callback();
-    });
-}
 
 function explictlyExcludeFromIndex(callback) {
     console.log('create collection with default index policy')

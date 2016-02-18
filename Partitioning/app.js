@@ -36,20 +36,6 @@ var client = new DocumentDBClient(host, { masterKey: masterKey });
 // 3. Use a custom PartitionResolver
 //------------------------------------------------------------------------------------------
 
-//ensuring a database & collection exists for us to work with
-init(function (err) {
-    if (!err) {
-        useHashPartitionResolver(databaseLink, function () {
-            useRangePartitionResolver(databaseLink, function () {
-                useCustomPartitionResolver(databaseLink, function () {
-                    finish();
-                });
-            });
-        });        
-    }
-});
-
-
 function useHashPartitionResolver(databaseLink, callback) {
     //create two collections to partition data across
     utils.getOrCreateCollection(client, databaseLink, 'Collection.HashBucket0', function (err, coll1) {
